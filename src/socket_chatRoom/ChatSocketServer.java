@@ -4,6 +4,7 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.List;
 
 public class ChatSocketServer {
 
@@ -11,6 +12,7 @@ public class ChatSocketServer {
 		private Socket socket = null;
 		private InputStream inStream = null;
 		private OutputStream outStream= null;
+		private List<Socket> clients;
 		
 		public ChatSocketServer(){}
 		
@@ -24,6 +26,7 @@ public class ChatSocketServer {
 					inStream = socket.getInputStream();
 					outStream = socket.getOutputStream();
 					String key = socket.getInetAddress().getHostAddress()+":"+socket.getPort();
+					clients.add(socket);
 					System.out.println("Connected"+key);
 					createReadThread();
 					createWriteThread();
@@ -61,8 +64,8 @@ public class ChatSocketServer {
 					}
 				}
 			};
-			readThread.setPriority(Thread.MAX_PRIORITY);
-			readThread.start();
+				readThread.setPriority(Thread.MAX_PRIORITY);
+				readThread.start();
 			}
 		
 		public void createWriteThread() {
