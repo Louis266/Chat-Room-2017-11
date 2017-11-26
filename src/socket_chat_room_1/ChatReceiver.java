@@ -1,9 +1,9 @@
 package socket_chat_room_1;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.Socket;
+import java.util.List;
+import java.util.Scanner;
 
 public class ChatReceiver implements Runnable {
 
@@ -19,26 +19,42 @@ public class ChatReceiver implements Runnable {
 
 	@Override
 	public void run() {
-		try (BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
-			String message;
-			while (!done && (message = in.readLine()) != null) {
-				String[] parts = message.split(":", 1);
+		try (Scanner in = new Scanner(socket.getInputStream(), "UTF-8");) {
+			while (!done && in.hasNextLine()) {
+				String message = in.nextLine();
+				channel.history.add(message);
+				String[] parts = message.split(":", 2);
 				switch (parts[0]) {
 				case Commands.ECHO:
 					channel.send(parts[1]);
 					break;
 				case Commands.BROADCAST:
+					channel.getServer().broadcast(channel.getUserName() + parts[1]);
 					break;
 				case Commands.KICK:
+					if (parts.length > 1 
+							&& channel.getServer().channels.containsKey(parts[1].trim())) {
+						channel.getServer().kick(parts[1], channel.getUserName());
+					}
 					break;
 				case Commands.LIST:
+					List<String> result = channel.getServer().getList();
+					for (String s : result) {
+						channel.send(s);
+					}
 					break;
 				case Commands.STATS:
+					List<String> history = channel.getServer().getHistory(parts[1].trim());
+					for (String h : history) {
+						channel.send(h);
+					}
 					break;
 				case Commands.STOP:
+					channel.getServer().broadcast(channel.getUserName() + "[LEFT]");
+					channel.stop();
 					break;
 				default:
-					
+					channel.send("[ERROR] INVALIED COMMAND: " + message);
 				}
 			}
 		} catch (IOException e) {

@@ -8,9 +8,8 @@ public class Server implements Runnable {
 	/**
 	 * this array list is used to store all client's info
 	 */
-	ArrayList<UserInfo> clients;
 	private boolean done = false;
-	private Map<String, ChatChannel> channels = new HashMap<>();
+	Map<String, ChatChannel> channels = new HashMap<>();
 
 	private long counter;
 
@@ -22,59 +21,13 @@ public class Server implements Runnable {
 	 * @author Louis
 	 *
 	 */
-	class clientHandler implements Runnable {
-		BufferedReader reader;
-		Socket socket;
 
-		/**
-		 * this constructor will read in the input stream from the socket
-		 * 
-		 * @param clientSocket
-		 *            for the reader
-		 */
-		public clientHandler(Socket clientSocket) {
-			try {
-				socket = clientSocket;
-				reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-
-		@Override
-		public void run() {
-
-			String message;
-			Character instruction;
-
-			try {
-				message = reader.readLine();
-				while (message != null) {
-					instruction = message.charAt(0);// read the first character
-													// as the instruction code
-					if (instruction.equals("1")) {
-						broadcast(message.substring(0, message.length()));
-					}
-					if (instruction.equals("2")) {
-						// stop()
-					}
-					if (instruction.equals("3")) {
-						// list()
-					}
-					if (instruction.equals("4")) {
-						// kick()
-					}
-					if (instruction.equals("5")) {
-						// stats()
-					}
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-
-		}// close run
-
-	}// close inner class
+	/**
+	 * this constructor will read in the input stream from the socket
+	 * 
+	 * @param clientSocket
+	 *            for the reader
+	 */
 
 	/**
 	 * this function is the main logic for the chat server
@@ -111,6 +64,7 @@ public class Server implements Runnable {
 =======
 	public void start() {
 		this.run();
+		System.out.println("Server started on port 9999!");
 	}// close start()
 
 >>>>>>> eab80d142b7eba716c6b219383bef6814d1da93e
@@ -118,44 +72,33 @@ public class Server implements Runnable {
 	 * this function will send all connected clients message it received
 	 */
 	public void broadcast(String message) {
-		Iterator<UserInfo> it = clients.iterator();
-		PrintWriter writer;
-		int i = 0;
-		while (it.hasNext()) {
-			try {
-				UserInfo user = clients.get(i);
-				Iterator it2 = user.getMessage().iterator();
-				while (it2.hasNext()) {
-					writer = (PrintWriter) it2.next();
-					writer.println(message);
-					writer.flush();
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+		for (ChatChannel channel : channels.values()) {
+			channel.send(message);
 		}
 	}
 
-	/**
-	 * this function will stop the connection between the server and the client
-	 * with the ID given followed
-	 */
-	public void terminate() {
-
+	public List<String> getHistory(String id) {
+		return channels.get(id).history;
 	}
 
 	/**
 	 * this function will list all connected clients' ID
 	 */
-	public void list() {
-
+	public List<String> getList() {
+		List<String> result = new ArrayList<>();
+		for (ChatChannel channel : channels.values()) {
+			result.add(channel.getUserName());
+		}
+		return result;
 	}
 
 	/**
 	 * this function will disconnect the client with the provided id
 	 */
-	public void kick() {
-
+	public void kick(String id, String kickerName) {
+		ChatChannel channel = channels.get(id);
+		broadcast(channel.getUserName() + "[KICKED OUT BY]" + kickerName );
+		channel.stop();
 	}
 
 	public static void main(String[] arg) {
@@ -167,7 +110,7 @@ public class Server implements Runnable {
 		try (ServerSocket server = new ServerSocket(9999);) {
 			while (!done) {
 				Socket clientSocket = server.accept();
-				String id = String.valueOf(counter++);
+				String id = String.valueOf(++counter);
 				ChatChannel channel = new ChatChannel(id, this, clientSocket);
 				this.channels.put(id, channel);
 				channel.start();
