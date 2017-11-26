@@ -72,7 +72,7 @@ public class Server {
 	 */
 	public void start(){
 		clients = new ArrayList<UserInfo>();
-		
+		//System.out.println("set up the server 1");
 		try{
 			@SuppressWarnings("resource")
 			ServerSocket server = new ServerSocket(8888);
@@ -86,10 +86,10 @@ public class Server {
 				user.addMessage(writer);
 				clients.add(user);
 				//clientWriter.add(writer);
-				
+				System.out.println("set up the server");
 				Thread t = new Thread(new clientHandler(clientSocket));
 				t.start();
-				
+				System.out.println("get a connection");
 				System.out.println(writer.toString());
 			}
 		}catch(Exception e){
