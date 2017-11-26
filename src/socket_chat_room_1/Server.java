@@ -79,41 +79,12 @@ public class Server implements Runnable {
 	/**
 	 * this function is the main logic for the chat server
 	 */
-<<<<<<< HEAD
-	public void start(){
-		clients = new ArrayList<UserInfo>();
-		//System.out.println("set up the server 1");
-		try{
-			@SuppressWarnings("resource")
-			ServerSocket server = new ServerSocket(8888);
-			
-			while(true){
-				Socket clientSocket = server.accept();
-				PrintWriter writer = new PrintWriter(clientSocket.getOutputStream());
-				UserInfo user = new UserInfo();
-				String key = (String)clientSocket.getInetAddress().getHostAddress()+clientSocket.getPort();
-				user.setID(key);
-				user.addMessage(writer);
-				clients.add(user);
-				//clientWriter.add(writer);
-				System.out.println("set up the server");
-				Thread t = new Thread(new clientHandler(clientSocket));
-				t.start();
-				System.out.println("get a connection");
-				System.out.println(writer.toString());
-			}
-		}catch(Exception e){
-			e.printStackTrace();
-		}
-		
-	}//close start()
-	
-=======
+
 	public void start() {
 		this.run();
 	}// close start()
 
->>>>>>> eab80d142b7eba716c6b219383bef6814d1da93e
+
 	/**
 	 * this function will send all connected clients message it received
 	 */
