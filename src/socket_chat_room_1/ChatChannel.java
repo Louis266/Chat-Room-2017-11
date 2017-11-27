@@ -50,4 +50,7 @@ public class ChatChannel {
 		return "[" + id + "]";
 	}
 
+	public String getId() {
+		return id;
+	}
 }

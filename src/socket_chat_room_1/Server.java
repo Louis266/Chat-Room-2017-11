@@ -35,7 +35,6 @@ public class Server implements Runnable {
 
 	public void start() {
 		this.run();
-		System.out.println("Server started on port 9999!");
 	}// close start()
 
 
@@ -79,6 +78,7 @@ public class Server implements Runnable {
 	@Override
 	public void run() {
 		try (ServerSocket server = new ServerSocket(9999);) {
+            System.out.println("Server started on port 9999");
 			while (!done) {
 				Socket clientSocket = server.accept();
 				String id = String.valueOf(++counter);

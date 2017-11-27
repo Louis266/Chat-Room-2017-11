@@ -46,7 +46,9 @@ public class ChatReceiver implements Runnable {
 				case Commands.STATS:
 					List<String> history = channel.getServer().getHistory(parts[1].trim());
 					for (String h : history) {
-						channel.send(h);
+						channel.send("[STATS]"
+								+ channel.getServer().channels.get(parts[1].trim()).getUserName()
+								+ h);
 					}
 					break;
 				case Commands.STOP:
@@ -60,6 +62,7 @@ public class ChatReceiver implements Runnable {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		channel.getServer().channels.remove(channel.getId());
 	}
 
 	public void stop() {
