@@ -6,36 +6,21 @@ import java.util.*;
 
 public class Server implements Runnable {
 	/**
-	 * this array list is used to store all client's info
+	 * we choose to use a map to store all channel objects;
+	 * also we use a counter to store id of channels
+	 * @author caiyihua
 	 */
 	private boolean done = false;
 	Map<String, ChatChannel> channels = new HashMap<>();
-
 	private long counter;
-
-	// ArrayList clientWriter;
+	
 	/**
-	 * this inner class is designed for the thread to handle different clients
-	 * using different sockets
-	 * 
-	 * @author Louis
-	 *
-	 */
-
-	/**
-	 * this constructor will read in the input stream from the socket
-	 * 
-	 * @param clientSocket
-	 *            for the reader
-	 */
-
-	/**
-	 * this function is the main logic for the chat server
+	 * start server
 	 */
 
 	public void start() {
 		this.run();
-	}// close start()
+	} // close start()
 
 
 	/**
@@ -46,13 +31,16 @@ public class Server implements Runnable {
 			channel.send(message);
 		}
 	}
-
+	/**
+	 * this function will get all commands sent by the client identified by @param id
+	 * it will return a list
+	 */
 	public List<String> getHistory(String id) {
 		return channels.get(id).history;
 	}
 
 	/**
-	 * this function will list all connected clients' ID
+	 * this function will list all connected clients' id stored in a list
 	 */
 	public List<String> getList() {
 		List<String> result = new ArrayList<>();
@@ -63,7 +51,7 @@ public class Server implements Runnable {
 	}
 
 	/**
-	 * this function will disconnect the client with the provided id
+	 * this function will disconnect the client with the provided id and broadcast a string stating the situation
 	 */
 	public void kick(String id, String kickerName) {
 		ChatChannel channel = channels.get(id);
@@ -71,21 +59,30 @@ public class Server implements Runnable {
 		channel.stop();
 	}
 
+	/**
+	 * main
+	 */
 	public static void main(String[] arg) {
 		new Server().start();
 	}
 
+	/**
+	 * this is the run method of a server thread, including main logic for a server
+	 */
 	@Override
 	public void run() {
-		try (ServerSocket server = new ServerSocket(9999);) {
+		try (ServerSocket server = new ServerSocket(9999);) { //listen to port 9999 of the localhost
             System.out.println("Server started on port 9999");
 			while (!done) {
-				Socket clientSocket = server.accept();
-				String id = String.valueOf(++counter);
+				Socket clientSocket = server.accept();//accept a connection
+				String id = String.valueOf(++counter);//set up its id
 				ChatChannel channel = new ChatChannel(id, this, clientSocket);
-				this.channels.put(id, channel);
-				channel.start();
+				//create a new instance of channel to store the socket and handle information transition
+				
+				this.channels.put(id, channel);//add new channel to the map using id as key
+				channel.start();//start this new channel logic
 			}
+			//when server closes, close all channels' connection in a map
 			for (ChatChannel cc : this.channels.values()) {
 				cc.stop();
 			}
