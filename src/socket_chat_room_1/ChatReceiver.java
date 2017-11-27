@@ -36,7 +36,7 @@ public class ChatReceiver implements Runnable {
 					channel.send(parts[1]);//when called upon, channel will send the part of message to the channel itself
 					break;
 				case Commands.BROADCAST://broadcast: send message to all clients
-					channel.getServer().broadcast(channel.getUserName() + parts[1]);
+					channel.getServer().broadcast(channel.getUserName() + "-> " + parts[1]);
 					//find channel's server and call its broadcast function using channel's id and message as parameter
 					break;
 				case Commands.KICK://kick: disconnect client with the provided id
@@ -49,6 +49,7 @@ public class ChatReceiver implements Runnable {
 					break;
 				case Commands.LIST://list: list all connected clients
 					List<String> result = channel.getServer().getList();//assign a new list of the channel
+                    channel.send("[User List] ->");
 					for (String s : result) {
 						channel.send(s);//loop and send results to the client
 					}
@@ -58,6 +59,7 @@ public class ChatReceiver implements Runnable {
 					for (String h : history) {
 						channel.send("[STATS]"
 								+ channel.getServer().channels.get(parts[1].trim()).getUserName()
+                                + " -> "
 								+ h);
 
 					} //loop through all values and send out all history message

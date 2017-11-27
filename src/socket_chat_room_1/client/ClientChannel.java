@@ -15,12 +15,13 @@ public class ClientChannel {
 		this.form = clientForm;
 	}
 
-	public void connect(String hostName, int portNumber) {
+	public boolean connect(String hostName, int portNumber) {
 		try {
 			socket = new Socket(hostName, portNumber);
 		} catch (IOException e) {
 		    form.showMessage("Failed to connect " + hostName + ":" + portNumber
                     + ".\n" + e);
+		    return false;
 		}
 
 		sender = new ClientSender(this, socket);
@@ -30,6 +31,7 @@ public class ClientChannel {
 		receiver = new ClientReceiver(this, socket);
 		Thread receiverThread = new Thread(receiver);
 		receiverThread.start();
+		return true;
 	}
 
 	public void stop() {
