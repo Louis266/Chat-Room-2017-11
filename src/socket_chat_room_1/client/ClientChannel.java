@@ -4,30 +4,39 @@ import java.io.IOException;
 import java.net.Socket;
 
 public class ClientChannel {
+	/**
+	 * basic fields for a chat channel
+	 * @author caiyihua
+	 */
+	private ClientForm form;//store its form
+	private Socket socket;//store socket
 
-	private ClientForm form;
-	private Socket socket;
-
-	private ClientReceiver receiver;
-	private ClientSender sender;
+	private ClientReceiver receiver;//store its receiver
+	private ClientSender sender;//store its sender
 
 	public ClientChannel(ClientForm clientForm) {
-		this.form = clientForm;
+		this.form = clientForm;//constructor that give channel a form
 	}
 
+	/**
+	 * try to connect to the host's port
+	 * @param hostName
+	 * @param portNumber
+	 * @return
+	 */
 	public boolean connect(String hostName, int portNumber) {
 		try {
-			socket = new Socket(hostName, portNumber);
+			socket = new Socket(hostName, portNumber);//set up a new socket connection
 		} catch (IOException e) {
 		    form.showMessage("Failed to connect " + hostName + ":" + portNumber
-                    + ".\n" + e);
+                    + ".\n" + e);//if not able to set up a connection than show message "not able to set up a connection"
 		    return false;
 		}
-
+		//start a sender thread
 		sender = new ClientSender(this, socket);
 		Thread senderThread = new Thread(sender);
-		senderThread.start();
-
+		senderThread.start();//start a sender thread
+		//start a receiver thread
 		receiver = new ClientReceiver(this, socket);
 		Thread receiverThread = new Thread(receiver);
 		receiverThread.start();

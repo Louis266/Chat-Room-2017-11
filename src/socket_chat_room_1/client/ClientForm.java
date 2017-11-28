@@ -9,40 +9,56 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class ClientForm {
-    private JTextArea txtReceived;
-    private JButton btnList;
-    private JButton btnStats;
-    private JButton btnKick;
+	/**
+	 * basic fields for a chat channel
+	 * @author caiyihua
+	 */
+	private JPanel mainForm;//main panel
+    private JTextField txtHost;
+    private JButton btnConnect;//button handling connection function
+    private JButton btnBroadcast;//button handling broadcast function
+    private JTextField txtMessage;
+    private JTextField txtUserId;
+    private JTextField txtPort;
+    private JTextArea txtReceived;//the area that show all received messages
+    private JButton btnList;//button of function LIST
+    private JButton btnStats;//button of function STATS
+    private JButton btnKick;//button of function KICK
+    
+    
 
-    ClientChannel channel = new ClientChannel(this);
+    ClientChannel channel = new ClientChannel(this);// assign a new channel with the form of itself
 
     public ClientForm() {
         btnConnect.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if ("Connect".equalsIgnoreCase(btnConnect.getText())) {
+                if ("Connect".equalsIgnoreCase(btnConnect.getText())) {// if a connection is established
                     String host;
                     int port;
                     try {
-                        host = txtHost.getText().trim();
-                        port = Integer.parseInt(txtPort.getText());
+                        host = txtHost.getText().trim();//get connection host
+                        port = Integer.parseInt(txtPort.getText());// get connection port
                     } catch (Exception ex) {
-                        showMessage("Invalid Host or Port.\n" + ex);
+                        showMessage("Invalid Host or Port.\n" + ex);//if not 
                         return;
                     }
-                    if (!channel.connect(host, port)) {
+                    if (!channel.connect(host, port)) {// if not connected, break out 
                         return;
                     }
                     ;
-                    btnConnect.setText("Stop");
+                    btnConnect.setText("Stop");//when connected, set the button as stop for breaking connection
                     enableChatting();
                 } else {
-                    channel.send(Commands.STOP);
+                    channel.send(Commands.STOP);//when connected, set stop button 
                     btnConnect.setText("Connect");
-                    disbleChatting();
+                    disbleChatting();//disable all button function
                 }
             }
         });
+        /**
+         * broadcast function
+         */
         btnBroadcast.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -53,12 +69,18 @@ public class ClientForm {
                 txtMessage.setText("");
             }
         });
+        /**
+         * list function
+         */
         btnList.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 channel.send(Commands.LIST);
             }
         });
+        /**
+         * kick function
+         */
         btnKick.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -69,6 +91,9 @@ public class ClientForm {
                 channel.send(Commands.KICK + ":" + id);
             }
         });
+        /**
+         * stats function
+         */
         btnStats.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -82,9 +107,9 @@ public class ClientForm {
     }
 
     public static void main(String[] args) {
-        JFrame frame = new JFrame("ClientForm");
-        ClientForm form = new ClientForm();
-        frame.setContentPane(form.mainForm);
+        JFrame frame = new JFrame("ClientForm");//set up new frame
+        ClientForm form = new ClientForm();//set up new form
+        frame.setContentPane(form.mainForm);//add form into the frame
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
         frame.getRootPane().setDefaultButton(form.btnBroadcast);
@@ -103,7 +128,7 @@ public class ClientForm {
         JOptionPane.showMessageDialog(null, msg);
     }
 
-    public void enableChatting() {
+    public void enableChatting() {//set all button able to be clicked
         txtMessage.setEnabled(true);
         btnBroadcast.setEnabled(true);
         txtUserId.setEnabled(true);
@@ -113,7 +138,7 @@ public class ClientForm {
         txtMessage.requestFocus();
     }
 
-    public void disbleChatting() {
+    public void disbleChatting() {// set all button as not able to be clicked
         txtMessage.setEnabled(false);
         btnBroadcast.setEnabled(false);
         txtUserId.setEnabled(false);
@@ -122,14 +147,10 @@ public class ClientForm {
         btnList.setEnabled(false);
         btnConnect.requestFocus();
     }
-
-    private JPanel mainForm;
-    private JTextField txtHost;
-    private JButton btnConnect;
-    private JButton btnBroadcast;
-    private JTextField txtMessage;
-    private JTextField txtUserId;
-    private JTextField txtPort;
+    
+ /**
+  * all GUI components and layouts are handled in IntelliJ, following code is automatically created by IntelliJ
+  */
 
     private void createUIComponents() {
         // TODO: place custom component creation code here
